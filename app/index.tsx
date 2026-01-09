@@ -273,7 +273,7 @@ export default function App() {
           padding: 36,
           alignItems: 'center',
         }}>
-          <Text style={{ textAlign: "center", lineHeight: 22 }}>
+          <Text style={{ textAlign: "center", lineHeight: 22,color:"#000" }}>
             You came here hoping for an explanation.
             {"\n\n"}
             There isn’t one.
