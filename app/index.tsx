@@ -1,15 +1,15 @@
-import { useEffect, useRef, useState } from "react";
-import { Pressable, StyleSheet, Animated } from "react-native";
+import { ThemedText as Text } from "@/components/themed-text";
+import { ThemedView as View } from "@/components/themed-view";
 import * as Haptics from "expo-haptics";
 import { Accelerometer } from "expo-sensors";
-import { ThemedView as View } from "@/components/themed-view";
-import { ThemedText as Text } from "@/components/themed-text";
+import { useEffect, useRef, useState } from "react";
+import { Animated, Pressable, StyleSheet } from "react-native";
 
 export default function App() {
   const [result, setResult] = useState<string | null>(null);
   const [locked, setLocked] = useState(false);
   const shakeCooldown = useRef(false);
-  
+
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
@@ -72,40 +72,44 @@ export default function App() {
   }
 
   return (
-    <Pressable style={styles.container} onPress={decide}>
-      <View style={styles.content}>
-        <Animated.View
-          style={{
-            transform: [{ scale: scaleAnim }],
-            opacity: fadeAnim,
-          }}
-        >
-          {result ? (
-            <>
-              <View style={[
-                styles.resultCard,
-                result === "YES" ? styles.yesCard : styles.noCard
-              ]}>
-                <Text style={[
-                  styles.result,
-                  result === "YES" ? styles.yesText : styles.noText
+    <View style={{ flex: 1 }}>
+      <Text>Just Decide</Text>
+      <Pressable style={styles.container} onPress={decide}>
+        <View style={styles.content}>
+          <Animated.View
+            style={{
+              transform: [{ scale: scaleAnim }],
+              opacity: fadeAnim,
+              alignItems: 'center',
+            }}
+          >
+            {result ? (
+              <>
+                <View style={[
+                  styles.resultCard,
+                  result === "YES" ? styles.yesCard : styles.noCard
                 ]}>
-                  {result}
+                  <Text style={[
+                    styles.result,
+                    result === "YES" ? styles.yesText : styles.noText
+                  ]}>
+                    {result}
+                  </Text>
+                </View>
+                <Text style={styles.sub}>
+                  {result === "YES" ? "Trust it." : "You already knew."}
                 </Text>
+              </>
+            ) : (
+              <View style={styles.promptCard}>
+                <Text style={styles.prompt}>Tap or shake</Text>
+                <Text style={styles.promptSub}>for your answer</Text>
               </View>
-              <Text style={styles.sub}>
-                {result === "YES" ? "Trust it." : "You already knew."}
-              </Text>
-            </>
-          ) : (
-            <View style={styles.promptCard}>
-              <Text style={styles.prompt}>Tap or shake</Text>
-              <Text style={styles.promptSub}>for your answer</Text>
-            </View>
-          )}
-        </Animated.View>
-      </View>
-    </Pressable>
+            )}
+          </Animated.View>
+        </View>
+      </Pressable>
+    </View>
   );
 }
 
@@ -114,35 +118,50 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    padding: 20,
   },
   content: {
     alignItems: "center",
     justifyContent: "center",
+    width: '100%',
+    maxWidth: 360,
   },
   resultCard: {
-    borderRadius: 24,
-    paddingHorizontal: 48,
-    paddingVertical: 32,
+    borderRadius: 32,
+    paddingHorizontal: 60,
+    paddingVertical: 50,
+    minWidth: 280,
+    minHeight: 200,
+    alignItems: 'center',
+    justifyContent: 'center',
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
-      height: 8,
+      height: 12,
     },
-    shadowOpacity: 0.2,
-    shadowRadius: 16,
-    elevation: 12,
+    shadowOpacity: 0.25,
+    shadowRadius: 24,
+    elevation: 16,
+    transform: [{ scale: 1.02 }],
   },
   yesCard: {
-    backgroundColor: "#10b981",
+    backgroundColor: "#059669",
+    borderWidth: 3,
+    borderColor: "#10b981",
   },
   noCard: {
-    backgroundColor: "#ef4444",
+    backgroundColor: "#dc2626",
+    borderWidth: 3,
+    borderColor: "#ef4444",
   },
   result: {
-    fontSize: 80,
+    fontSize: 96,
     fontWeight: "900",
-    letterSpacing: 4,
+    letterSpacing: 6,
     textAlign: "center",
+    textShadowColor: 'rgba(0,0,0,0.3)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
   },
   yesText: {
     color: "#ffffff",
@@ -151,32 +170,48 @@ const styles = StyleSheet.create({
     color: "#ffffff",
   },
   sub: {
-    marginTop: 24,
-    color: "#888",
-    fontSize: 18,
+    marginTop: 36,
+    color: "#666",
+    fontSize: 22,
     textAlign: "center",
     fontStyle: "italic",
-    letterSpacing: 0.5,
+    letterSpacing: 1,
+    fontWeight: "500",
   },
   promptCard: {
-    paddingHorizontal: 48,
-    paddingVertical: 32,
-    borderRadius: 24,
-    borderWidth: 2,
-    borderColor: "#ddd",
+    paddingHorizontal: 60,
+    paddingVertical: 50,
+    borderRadius: 32,
+    borderWidth: 3,
+    borderColor: "#cbd5e1",
     borderStyle: "dashed",
+    backgroundColor: "rgba(248, 250, 252, 0.8)",
+    minWidth: 280,
+    minHeight: 200,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 6,
   },
   prompt: {
-    fontSize: 28,
-    fontWeight: "600",
+    fontSize: 32,
+    fontWeight: "700",
     textAlign: "center",
-    color: "#666",
-    letterSpacing: 1,
+    color: "#374151",
+    letterSpacing: 2,
+    marginBottom: 8,
   },
   promptSub: {
-    fontSize: 16,
+    fontSize: 18,
     textAlign: "center",
-    color: "#999",
-    marginTop: 4,
+    color: "#6b7280",
+    letterSpacing: 0.5,
+    fontWeight: "400",
   },
 });
