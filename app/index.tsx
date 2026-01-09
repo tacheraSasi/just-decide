@@ -311,7 +311,7 @@ function getStyles(colorScheme: "light" | "dark" | null | undefined, isShaking: 
       borderColor: isDark ? "#f87171" : "#fca5a5",
     },
     result: {
-      fontSize: CARD_SIZE * 0.3,
+      fontSize: CARD_SIZE * 0.1,
       fontWeight: "900",
       letterSpacing: 2,
       textAlign: "center",
