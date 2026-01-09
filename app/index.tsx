@@ -175,9 +175,10 @@ function getStyles(colorScheme: 'light' | 'dark' | null | undefined) {
       borderColor: isDark ? "#dc2626" : "#ef4444",
     },
     result: {
-      fontSize: 96,
+      fontSize: 40,
       fontWeight: "900",
       letterSpacing: 6,
+      padding:20,
       textAlign: "center",
       textShadowColor: 'rgba(0,0,0,0.3)',
       textShadowOffset: { width: 0, height: 2 },
