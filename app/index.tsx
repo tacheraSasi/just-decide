@@ -264,7 +264,7 @@ export default function App() {
         index={-1}
         ref={bottomSheetRef}
         backdropComponent={BottomSheetBackdrop}
-      enablePanDownToClose={true}
+        enablePanDownToClose={true}
         onChange={handleSheetChanges}
 
       >
@@ -273,7 +273,26 @@ export default function App() {
           padding: 36,
           alignItems: 'center',
         }}>
-          <Text>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Accusantium, vitae sequi atque omnis explicabo quo quos in commodi aperiam maiores? Amet quae officiis ex itaque incidunt a accusamus ratione? Eos.</Text>
+          <Text style={{ textAlign: "center", lineHeight: 22 }}>
+            You came here hoping for an explanation.
+            {"\n\n"}
+            There isn’t one.
+            {"\n\n"}
+            This app gives you permission to do what you already want.
+            Or not.
+          </Text>
+
+          <Text
+            style={{
+              marginTop: 32,
+              fontSize: 12,
+              color: "#666",
+              textAlign: "center",
+            }}
+          >
+            Created by Tach. Blame him.
+          </Text>
+
         </BottomSheetView>
       </BottomSheet>
     </View>
