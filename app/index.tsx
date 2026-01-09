@@ -242,6 +242,9 @@ export default function App() {
             ? "Consulting the universe..."
             : "Shake your phone for a quick decision"}
         </Text>
+
+        <View style={styles.aboutContainer}><Text style={styles.aboutText}>about</Text></View>
+        
       </View>
     </View>
   );
@@ -255,7 +258,6 @@ function getStyles(colorScheme: "light" | "dark" | null | undefined, isShaking: 
       flex: 1,
       paddingTop: 60,
       paddingHorizontal: 20,
-      backgroundColor: isDark ? "#0a0a0a" : "#f8fafc",
     },
     header: {
       alignItems: "center",
@@ -266,7 +268,6 @@ function getStyles(colorScheme: "light" | "dark" | null | undefined, isShaking: 
       fontWeight: "800",
       letterSpacing: -0.5,
       marginBottom: 8,
-      color: isDark ? "#ffffff" : "#1a1a1a",
     },
     subtitle: {
       fontSize: 16,
@@ -335,8 +336,8 @@ function getStyles(colorScheme: "light" | "dark" | null | undefined, isShaking: 
           ? "#6366f1"
           : "#4f46e5"
         : isDark
-        ? "#404040"
-        : "#cbd5e1",
+          ? "#404040"
+          : "#cbd5e1",
       borderStyle: "dashed",
       backgroundColor: isDark ? "#1a1a1a" : "#ffffff",
       alignItems: "center",
@@ -359,8 +360,8 @@ function getStyles(colorScheme: "light" | "dark" | null | undefined, isShaking: 
           ? "#6366f1"
           : "#4f46e5"
         : isDark
-        ? "#71717a"
-        : "#9ca3af",
+          ? "#71717a"
+          : "#9ca3af",
       marginBottom: 16,
       opacity: isShaking ? 1 : 0.8,
     },
@@ -373,8 +374,8 @@ function getStyles(colorScheme: "light" | "dark" | null | undefined, isShaking: 
           ? "#6366f1"
           : "#4f46e5"
         : isDark
-        ? "#a1a1aa"
-        : "#6b7280",
+          ? "#a1a1aa"
+          : "#6b7280",
       letterSpacing: 0.5,
     },
     footer: {
@@ -398,5 +399,13 @@ function getStyles(colorScheme: "light" | "dark" | null | undefined, isShaking: 
       textAlign: "center",
       fontStyle: "italic",
     },
+    aboutContainer: { marginTop: 12 },
+    aboutText: {
+      fontSize: 14,
+      color: isDark ? "#71717a" : "#9ca3af",
+      textAlign: "center",
+      textDecorationLine: "underline",
+    },
   });
+
 }
