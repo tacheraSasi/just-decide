@@ -1,98 +1,83 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { useEffect, useRef, useState } from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import * as Haptics from "expo-haptics";
+import { Accelerometer } from "expo-sensors";
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+export default function App() {
+  const [result, setResult] = useState<string | null>(null);
+  const [locked, setLocked] = useState(false);
+  const shakeCooldown = useRef(false);
 
-export default function HomeScreen() {
+  useEffect(() => {
+    Accelerometer.setUpdateInterval(100);
+
+    const sub = Accelerometer.addListener(({ x, y, z }) => {
+      const force = Math.sqrt(x * x + y * y + z * z);
+      if (force > 2.2 && !shakeCooldown.current) {
+        shakeCooldown.current = true;
+        decide();
+        setTimeout(() => (shakeCooldown.current = false), 1500);
+      }
+    });
+
+    return () => sub.remove();
+  }, []);
+
+  function decide() {
+    if (locked) return;
+
+    setLocked(true);
+    setResult(null);
+
+    setTimeout(() => {
+      const yes = Math.random() < 0.5;
+      setResult(yes ? "YES" : "NO");
+
+      if (yes) {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+      } else {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      }
+
+      setTimeout(() => setLocked(false), 300);
+    }, 220);
+  }
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
-
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <Pressable style={styles.container} onPress={decide}>
+      <View>
+        <Text style={styles.result}>
+          {result ?? " "}
+        </Text>
+        {result && (
+          <Text style={styles.sub}>
+            {result === "YES" ? "Trust it." : "You already knew."}
+          </Text>
+        )}
+      </View>
+    </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: {
+    flex: 1,
+    backgroundColor: "#000",
+    alignItems: "center",
+    justifyContent: "center",
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  result: {
+    color: "#fff",
+    fontSize: 72,
+    fontWeight: "800",
+    letterSpacing: 2,
+    textAlign: "center",
+    transform: [{ scale: 1 }],
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  sub: {
+    marginTop: 12,
+    color: "#888",
+    fontSize: 16,
+    textAlign: "center",
   },
 });
