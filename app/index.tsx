@@ -3,7 +3,7 @@ import { ThemedView as View } from "@/components/themed-view";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import * as Haptics from "expo-haptics";
 import { Accelerometer } from "expo-sensors";
-import { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Animated,
   Dimensions,
@@ -11,6 +11,8 @@ import {
   Pressable,
   StyleSheet,
 } from "react-native";
+import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
+
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const CARD_SIZE = Math.min(SCREEN_WIDTH * 0.85, 340);
@@ -29,6 +31,14 @@ export default function App() {
   const shakeAnim = useRef(new Animated.Value(0)).current;
 
   const styles = getStyles(colorScheme, isShaking);
+
+  const bottomSheetRef = useRef<BottomSheet>(null);
+
+  // callbacks
+  const handleSheetChanges = useCallback((index: number) => {
+    console.log('handleSheetChanges', index);
+  }, []);
+
 
   useEffect(() => {
     Accelerometer.setUpdateInterval(100);
@@ -243,9 +253,29 @@ export default function App() {
             : "Shake your phone for a quick decision"}
         </Text>
 
-        <View style={styles.aboutContainer}><Text style={styles.aboutText}>about</Text></View>
-        
+        <Pressable style={styles.aboutContainer} onPress={() => {
+          bottomSheetRef.current?.expand()
+        }}>
+          <Text style={styles.aboutText}>about</Text>
+        </Pressable>
       </View>
+      {/* About me */}
+      <BottomSheet
+        index={-1}
+        ref={bottomSheetRef}
+        backdropComponent={BottomSheetBackdrop}
+      enablePanDownToClose={true}
+        onChange={handleSheetChanges}
+
+      >
+        <BottomSheetView style={{
+          flex: 1,
+          padding: 36,
+          alignItems: 'center',
+        }}>
+          <Text>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Accusantium, vitae sequi atque omnis explicabo quo quos in commodi aperiam maiores? Amet quae officiis ex itaque incidunt a accusamus ratione? Eos.</Text>
+        </BottomSheetView>
+      </BottomSheet>
     </View>
   );
 }
