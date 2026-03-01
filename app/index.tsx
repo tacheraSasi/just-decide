@@ -1,6 +1,10 @@
 import { ThemedText as Text } from "@/components/themed-text";
 import { ThemedView as View } from "@/components/themed-view";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import BottomSheet, {
+  BottomSheetBackdrop,
+  BottomSheetView,
+} from "@gorhom/bottom-sheet";
 import * as Haptics from "expo-haptics";
 import { Accelerometer } from "expo-sensors";
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -11,8 +15,6 @@ import {
   Pressable,
   StyleSheet,
 } from "react-native";
-import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
-
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const CARD_SIZE = Math.min(SCREEN_WIDTH * 0.85, 340);
@@ -36,9 +38,8 @@ export default function App() {
 
   // callbacks
   const handleSheetChanges = useCallback((index: number) => {
-    console.log('handleSheetChanges', index);
+    console.log("handleSheetChanges", index);
   }, []);
-
 
   useEffect(() => {
     Accelerometer.setUpdateInterval(100);
@@ -136,8 +137,8 @@ export default function App() {
       ]).start();
 
       setTimeout(() => {
-        const yes = Math.random() < 0.5;
-        const resultText = yes ? "YES" : "NO";
+        const rand = Math.random();
+        const resultText = rand < 0.4 ? "YES" : rand < 0.8 ? "NO" : "MAYBE";
         setResult(resultText);
 
         // Fade in new result
@@ -149,8 +150,10 @@ export default function App() {
         }).start();
 
         // Haptic feedback
-        if (yes) {
+        if (resultText === "YES") {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+        } else if (resultText === "MAYBE") {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
         } else {
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
         }
@@ -176,9 +179,7 @@ export default function App() {
         <Text type="title" style={styles.appTitle}>
           Just Decide
         </Text>
-        <Text style={styles.subtitle}>
-          Tap or shake to make a decision
-        </Text>
+        <Text style={styles.subtitle}>Tap or shake to make a decision</Text>
       </View>
 
       <Pressable
@@ -204,13 +205,21 @@ export default function App() {
             <View
               style={[
                 styles.resultCard,
-                result === "YES" ? styles.yesCard : styles.noCard,
+                result === "YES"
+                  ? styles.yesCard
+                  : result === "MAYBE"
+                    ? styles.maybeCard
+                    : styles.noCard,
               ]}
             >
               <Text
                 style={[
                   styles.result,
-                  result === "YES" ? styles.yesText : styles.noText,
+                  result === "YES"
+                    ? styles.yesText
+                    : result === "MAYBE"
+                      ? styles.maybeText
+                      : styles.noText,
                 ]}
                 adjustsFontSizeToFit
                 numberOfLines={1}
@@ -240,7 +249,9 @@ export default function App() {
             <Text style={styles.resultSubtitle}>
               {result === "YES"
                 ? "Go for it! ✨"
-                : "Maybe not... 🤔"}
+                : result === "MAYBE"
+                  ? "Think it over... 🤷"
+                  : "Maybe not... 🤔"}
             </Text>
           </Animated.View>
         )}
@@ -253,9 +264,12 @@ export default function App() {
             : "Shake your phone for a quick decision"}
         </Text>
 
-        <Pressable style={styles.aboutContainer} onPress={() => {
-          bottomSheetRef.current?.expand()
-        }}>
+        <Pressable
+          style={styles.aboutContainer}
+          onPress={() => {
+            bottomSheetRef.current?.expand();
+          }}
+        >
           <Text style={styles.aboutText}>about</Text>
         </Pressable>
       </View>
@@ -266,20 +280,20 @@ export default function App() {
         backdropComponent={BottomSheetBackdrop}
         enablePanDownToClose={true}
         onChange={handleSheetChanges}
-
       >
-        <BottomSheetView style={{
-          flex: 1,
-          padding: 36,
-          alignItems: 'center',
-        }}>
-          <Text style={{ textAlign: "center", lineHeight: 22,color:"#000" }}>
+        <BottomSheetView
+          style={{
+            flex: 1,
+            padding: 36,
+            alignItems: "center",
+          }}
+        >
+          <Text style={{ textAlign: "center", lineHeight: 22, color: "#000" }}>
             You came here hoping for an explanation.
             {"\n\n"}
             There isn’t one.
             {"\n\n"}
-            This app gives you permission to do what you already want.
-            Or not.
+            This app gives you permission to do what you already want. Or not.
           </Text>
 
           <Text
@@ -292,14 +306,16 @@ export default function App() {
           >
             Created by Tach. Blame him.
           </Text>
-
         </BottomSheetView>
       </BottomSheet>
     </View>
   );
 }
 
-function getStyles(colorScheme: "light" | "dark" | null | undefined, isShaking: boolean) {
+function getStyles(
+  colorScheme: "light" | "dark" | null | undefined,
+  isShaking: boolean,
+) {
   const isDark = colorScheme === "dark";
 
   return StyleSheet.create({
@@ -360,6 +376,11 @@ function getStyles(colorScheme: "light" | "dark" | null | undefined, isShaking: 
       borderWidth: 4,
       borderColor: isDark ? "#f87171" : "#fca5a5",
     },
+    maybeCard: {
+      backgroundColor: isDark ? "#d97706" : "#f59e0b",
+      borderWidth: 4,
+      borderColor: isDark ? "#fbbf24" : "#fde68a",
+    },
     result: {
       fontSize: CARD_SIZE * 0.1,
       fontWeight: "900",
@@ -373,6 +394,9 @@ function getStyles(colorScheme: "light" | "dark" | null | undefined, isShaking: 
       color: "#ffffff",
     },
     noText: {
+      color: "#ffffff",
+    },
+    maybeText: {
       color: "#ffffff",
     },
     promptCard: {
@@ -456,5 +480,4 @@ function getStyles(colorScheme: "light" | "dark" | null | undefined, isShaking: 
       textDecorationLine: "underline",
     },
   });
-
 }
