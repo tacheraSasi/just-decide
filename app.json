@@ -2,7 +2,7 @@
   "expo": {
     "name": "just-decide",
     "slug": "just-decide",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon/android/play_store_512.png",
     "scheme": "justdecide",
