@@ -512,7 +512,7 @@ export default function App() {
         <View style={styles.hintRow}>
           <Ionicons
             name="phone-portrait-outline"
-            size={14}
+            size={20}
             color={isDark ? "#52525b" : "#a1a1aa"}
             style={{ marginRight: 6 }}
           />
@@ -855,7 +855,7 @@ function getStyles(isDark: boolean, isShaking: boolean) {
       paddingHorizontal: 16,
     },
     hintText: {
-      fontSize: 13,
+      fontSize:20,
       color: isDark ? "#52525b" : "#a1a1aa",
       textAlign: "center",
       lineHeight: 20,
