@@ -1,6 +1,5 @@
 import { ThemedText as Text } from "@/components/themed-text";
-import { ThemedView as View } from "@/components/themed-view";
-import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useTheme } from "@/contexts/theme-context";
 import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetView,
@@ -17,6 +16,7 @@ import {
   Platform,
   Pressable,
   StyleSheet,
+  View,
 } from "react-native";
 import ConfettiCannon from "react-native-confetti-cannon";
 
@@ -56,8 +56,8 @@ export default function App() {
   const [isShaking, setIsShaking] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const shakeCooldown = useRef(false);
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
+
+  const { isDark, toggle: toggleTheme, mode: themeMode } = useTheme();
 
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const fadeAnim = useRef(new Animated.Value(1)).current;
@@ -92,7 +92,7 @@ export default function App() {
     );
     if (!locked && !result) pulse.start();
     return () => pulse.stop();
-  }, [locked, result]);
+  }, [locked, result]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Glow animation when shaking
   useEffect(() => {
@@ -114,7 +114,7 @@ export default function App() {
     } else {
       glowAnim.setValue(0);
     }
-  }, [isShaking]);
+  }, [isShaking]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     Accelerometer.setUpdateInterval(100);
@@ -133,7 +133,7 @@ export default function App() {
     });
 
     return () => sub.remove();
-  }, [locked]);
+  }, [locked]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const animateShake = () => {
     Animated.sequence([
@@ -177,7 +177,7 @@ export default function App() {
     setShowConfetti(false);
     animateShake();
 
-    // Fade out + scale down hint text
+    // Fade hint text
     Animated.timing(hintOpacity, {
       toValue: 0.4,
       duration: 200,
@@ -292,11 +292,18 @@ export default function App() {
 
   const bgGradient = (
     isDark
-      ? ["#0a0a0f", "#111127", "#0a0a0f"]
-      : ["#f0f4ff", "#e8ecf9", "#f5f0ff"]
+      ? ["#08080f", "#0f0f23", "#0c0c18"]
+      : ["#f8f9ff", "#eef1fb", "#f5f0ff"]
   ) as [string, string, ...string[]];
 
   const styles = getStyles(isDark, isShaking);
+
+  const themeIcon =
+    themeMode === "system"
+      ? "phone-portrait-outline"
+      : isDark
+        ? "moon"
+        : "sunny";
 
   return (
     <LinearGradient colors={bgGradient} style={styles.mainContainer}>
@@ -306,13 +313,13 @@ export default function App() {
           style={[
             styles.orb,
             {
-              top: SCREEN_HEIGHT * 0.08,
+              top: SCREEN_HEIGHT * 0.06,
               left: -SCREEN_WIDTH * 0.2,
               width: SCREEN_WIDTH * 0.6,
               height: SCREEN_WIDTH * 0.6,
               backgroundColor: isDark
-                ? "rgba(99,102,241,0.08)"
-                : "rgba(99,102,241,0.06)",
+                ? "rgba(99,102,241,0.07)"
+                : "rgba(129,140,248,0.08)",
             },
           ]}
         />
@@ -325,20 +332,58 @@ export default function App() {
               width: SCREEN_WIDTH * 0.7,
               height: SCREEN_WIDTH * 0.7,
               backgroundColor: isDark
-                ? "rgba(236,72,153,0.06)"
-                : "rgba(236,72,153,0.04)",
+                ? "rgba(236,72,153,0.05)"
+                : "rgba(244,114,182,0.06)",
+            },
+          ]}
+        />
+        <View
+          style={[
+            styles.orb,
+            {
+              bottom: SCREEN_HEIGHT * 0.05,
+              left: SCREEN_WIDTH * 0.1,
+              width: SCREEN_WIDTH * 0.4,
+              height: SCREEN_WIDTH * 0.4,
+              backgroundColor: isDark
+                ? "rgba(52,211,153,0.04)"
+                : "rgba(52,211,153,0.05)",
             },
           ]}
         />
       </View>
 
-      {/* Header */}
+      {/* Header with theme toggle */}
       <View style={styles.header}>
-        <Text
-          style={[styles.appTitle, { color: isDark ? "#ffffff" : "#1a1a2e" }]}
-        >
-          Just Decide
-        </Text>
+        <View style={styles.headerRow}>
+          <View style={styles.headerSpacer} />
+          <View style={styles.headerCenter}>
+            <Text
+              style={[
+                styles.appTitle,
+                { color: isDark ? "#f4f4f5" : "#18181b" },
+              ]}
+            >
+              Just Decide
+            </Text>
+          </View>
+          <View style={styles.headerTrailing}>
+            <Pressable
+              onPress={toggleTheme}
+              style={({ pressed }) => [
+                styles.themeToggle,
+                pressed && { opacity: 0.6, transform: [{ scale: 0.92 }] },
+              ]}
+              hitSlop={14}
+            >
+              <Ionicons
+                name={themeIcon as any}
+                size={20}
+                color={isDark ? "#a1a1aa" : "#71717a"}
+              />
+            </Pressable>
+          </View>
+        </View>
         <Text style={styles.subtitle}>
           {locked ? "Consulting the universe..." : "Tap the orb or shake"}
         </Text>
@@ -381,7 +426,7 @@ export default function App() {
                 <View style={styles.resultIconRow}>
                   <Ionicons
                     name={RESULT_CONFIG[result].icon}
-                    size={40}
+                    size={38}
                     color="rgba(255,255,255,0.9)"
                   />
                 </View>
@@ -398,28 +443,33 @@ export default function App() {
                 </Text>
               </LinearGradient>
             ) : (
-              <View style={styles.promptCard}>
+              <View
+                style={[
+                  styles.promptCard,
+                  isDark ? styles.promptCardDark : styles.promptCardLight,
+                ]}
+              >
                 <LinearGradient
                   colors={
                     (isDark
-                      ? ["rgba(255,255,255,0.05)", "rgba(255,255,255,0.02)"]
-                      : ["rgba(255,255,255,0.9)", "rgba(255,255,255,0.6)"]) as [
-                      string,
-                      string,
-                    ]
+                      ? ["rgba(255,255,255,0.04)", "rgba(255,255,255,0.01)"]
+                      : [
+                          "rgba(255,255,255,0.95)",
+                          "rgba(240,243,255,0.8)",
+                        ]) as [string, string]
                   }
                   style={styles.promptGlass}
                 >
                   <Animated.View
                     style={{
-                      opacity: isShaking ? glowAnim : 0.6,
+                      opacity: isShaking ? glowAnim : 0.55,
                     }}
                   >
                     <Ionicons
                       name={isShaking ? "sparkles" : "help"}
-                      size={CARD_SIZE * 0.22}
+                      size={CARD_SIZE * 0.2}
                       color={
-                        isShaking ? "#818cf8" : isDark ? "#52525b" : "#a1a1aa"
+                        isShaking ? "#818cf8" : isDark ? "#4a4a57" : "#b4b4c4"
                       }
                     />
                   </Animated.View>
@@ -462,7 +512,7 @@ export default function App() {
         <View style={styles.hintRow}>
           <Ionicons
             name="phone-portrait-outline"
-            size={16}
+            size={14}
             color={isDark ? "#52525b" : "#a1a1aa"}
             style={{ marginRight: 6 }}
           />
@@ -479,7 +529,7 @@ export default function App() {
         >
           <Ionicons
             name="information-circle-outline"
-            size={18}
+            size={16}
             color={isDark ? "#52525b" : "#a1a1aa"}
             style={{ marginRight: 4 }}
           />
@@ -523,11 +573,11 @@ export default function App() {
         enablePanDownToClose
         onChange={handleSheetChanges}
         backgroundStyle={{
-          backgroundColor: isDark ? "#1c1c2e" : "#ffffff",
+          backgroundColor: isDark ? "#18182b" : "#ffffff",
           borderRadius: 28,
         }}
         handleIndicatorStyle={{
-          backgroundColor: isDark ? "#3f3f5c" : "#d1d5db",
+          backgroundColor: isDark ? "#3f3f5c" : "#d4d4d8",
           width: 40,
         }}
       >
@@ -535,7 +585,7 @@ export default function App() {
           <View style={styles.sheetIconWrap}>
             <Ionicons
               name="sparkles"
-              size={28}
+              size={26}
               color={isDark ? "#818cf8" : "#6366f1"}
             />
           </View>
@@ -543,7 +593,7 @@ export default function App() {
           <Text
             style={[
               styles.sheetTitle,
-              { color: isDark ? "#e4e4e7" : "#1a1a2e" },
+              { color: isDark ? "#e4e4e7" : "#18181b" },
             ]}
           >
             What is this?
@@ -563,7 +613,7 @@ export default function App() {
               { color: isDark ? "#a1a1aa" : "#52525b" },
             ]}
           >
-            There isn{"'"}t one.
+            {"There isn't one."}
           </Text>
           <Text
             style={[
@@ -579,7 +629,7 @@ export default function App() {
           <Text
             style={[
               styles.sheetCredit,
-              { color: isDark ? "#52525b" : "#9ca3af" },
+              { color: isDark ? "#52525b" : "#a1a1aa" },
             ]}
           >
             Created by Tach. Blame him.
@@ -594,7 +644,7 @@ function getStyles(isDark: boolean, isShaking: boolean) {
   return StyleSheet.create({
     mainContainer: {
       flex: 1,
-      paddingTop: Platform.OS === "ios" ? 64 : 48,
+      paddingTop: Platform.OS === "ios" ? 62 : 44,
     },
     orbContainer: {
       ...StyleSheet.absoluteFillObject,
@@ -604,27 +654,60 @@ function getStyles(isDark: boolean, isShaking: boolean) {
       position: "absolute",
       borderRadius: 9999,
     },
+
+    // ── Header ──────────────────────────────────────────
     header: {
       alignItems: "center",
-      paddingHorizontal: 24,
-      marginBottom: 12,
+      paddingHorizontal: 20,
+      marginBottom: 8,
+    },
+    headerRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      width: "100%",
+      marginBottom: 6,
+    },
+    headerSpacer: {
+      width: 40,
+    },
+    headerCenter: {
+      flex: 1,
+      alignItems: "center",
+    },
+    headerTrailing: {
+      width: 40,
+      alignItems: "flex-end",
+    },
+    themeToggle: {
+      width: 38,
+      height: 38,
+      borderRadius: 19,
+      backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)",
+      alignItems: "center",
+      justifyContent: "center",
+      borderWidth: 1,
+      borderColor: isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)",
     },
     appTitle: {
-      fontSize: 34,
+      fontSize: 32,
       fontWeight: "800",
-      letterSpacing: -1,
+      letterSpacing: -0.8,
       textAlign: "center",
-      padding: 0,
-      marginBottom: 6,
+      lineHeight: 42,
+      paddingVertical: 2,
     },
     subtitle: {
       fontSize: 15,
       fontWeight: "500",
-      color: isDark ? "#71717a" : "#9ca3af",
+      color: isDark ? "#71717a" : "#a1a1aa",
       textAlign: "center",
-      padding: 0,
+      lineHeight: 22,
+      paddingVertical: 2,
+      paddingHorizontal: 16,
       letterSpacing: 0.2,
     },
+
+    // ── Card area ───────────────────────────────────────
     container: {
       flex: 1,
       alignItems: "center",
@@ -641,17 +724,20 @@ function getStyles(isDark: boolean, isShaking: boolean) {
       width: "100%",
       height: "100%",
     },
+
+    // ── Result card ─────────────────────────────────────
     resultCard: {
       width: "100%",
       height: "100%",
       borderRadius: CARD_SIZE / 2,
       alignItems: "center",
       justifyContent: "center",
+      paddingHorizontal: 20,
       ...Platform.select({
         ios: {
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 16 },
-          shadowOpacity: 0.35,
+          shadowColor: isDark ? "#000" : "#4338ca",
+          shadowOffset: { width: 0, height: 14 },
+          shadowOpacity: isDark ? 0.45 : 0.25,
           shadowRadius: 28,
         },
         android: {
@@ -660,72 +746,90 @@ function getStyles(isDark: boolean, isShaking: boolean) {
       }),
     },
     resultIconRow: {
-      marginBottom: 4,
+      marginBottom: 6,
     },
     resultText: {
-      fontSize: CARD_SIZE * 0.15,
+      fontSize: CARD_SIZE * 0.14,
       fontWeight: "900",
-      letterSpacing: 6,
+      letterSpacing: 5,
       color: "#ffffff",
       textAlign: "center",
-      padding: 0,
-      textShadowColor: "rgba(0,0,0,0.2)",
+      lineHeight: CARD_SIZE * 0.2,
+      paddingHorizontal: 16,
+      paddingVertical: 4,
+      textShadowColor: "rgba(0,0,0,0.25)",
       textShadowOffset: { width: 0, height: 2 },
       textShadowRadius: 8,
     },
     resultDivider: {
-      width: 40,
+      width: 36,
       height: 2,
       borderRadius: 1,
       backgroundColor: "rgba(255,255,255,0.3)",
       marginVertical: 10,
     },
     resultEmoji: {
-      fontSize: 28,
-      padding: 0,
+      fontSize: 26,
+      lineHeight: 36,
+      paddingVertical: 2,
     },
+
+    // ── Prompt card ─────────────────────────────────────
     promptCard: {
       width: "100%",
       height: "100%",
       borderRadius: CARD_SIZE / 2,
       overflow: "hidden",
       borderWidth: 1.5,
+    },
+    promptCardDark: {
       borderColor: isShaking
-        ? isDark
-          ? "rgba(129,140,248,0.5)"
-          : "rgba(99,102,241,0.3)"
-        : isDark
-          ? "rgba(255,255,255,0.08)"
-          : "rgba(0,0,0,0.06)",
+        ? "rgba(129,140,248,0.4)"
+        : "rgba(255,255,255,0.07)",
       ...Platform.select({
         ios: {
           shadowColor: isShaking ? "#6366f1" : "#000",
           shadowOffset: { width: 0, height: isShaking ? 12 : 8 },
-          shadowOpacity: isShaking ? 0.3 : 0.12,
+          shadowOpacity: isShaking ? 0.35 : 0.3,
           shadowRadius: isShaking ? 24 : 20,
         },
-        android: {
-          elevation: 10,
+        android: { elevation: 12 },
+      }),
+    },
+    promptCardLight: {
+      borderColor: isShaking ? "rgba(99,102,241,0.25)" : "rgba(0,0,0,0.06)",
+      ...Platform.select({
+        ios: {
+          shadowColor: isShaking ? "#6366f1" : "#94a3b8",
+          shadowOffset: { width: 0, height: isShaking ? 10 : 8 },
+          shadowOpacity: isShaking ? 0.2 : 0.15,
+          shadowRadius: isShaking ? 22 : 18,
         },
+        android: { elevation: 10 },
       }),
     },
     promptGlass: {
       flex: 1,
       alignItems: "center",
       justifyContent: "center",
-      gap: 16,
+      gap: 18,
+      paddingHorizontal: 24,
     },
     promptSub: {
       fontSize: 17,
       fontWeight: "600",
       textAlign: "center",
-      color: isDark ? "#71717a" : "#9ca3af",
+      color: isDark ? "#62626e" : "#a1a1b5",
       letterSpacing: 0.5,
-      padding: 0,
+      lineHeight: 24,
+      paddingVertical: 2,
     },
+
+    // ── Footer / subtitle ───────────────────────────────
     footer: {
-      marginTop: 32,
+      marginTop: 28,
       alignItems: "center",
+      paddingHorizontal: 24,
     },
     resultSubtitle: {
       fontSize: 20,
@@ -733,11 +837,14 @@ function getStyles(isDark: boolean, isShaking: boolean) {
       textAlign: "center",
       color: isDark ? "#d4d4d8" : "#374151",
       letterSpacing: 0.3,
-      padding: 0,
+      lineHeight: 28,
+      paddingVertical: 4,
     },
+
+    // ── Hint area ───────────────────────────────────────
     hintContainer: {
-      paddingBottom: Platform.OS === "ios" ? 40 : 28,
-      paddingTop: 12,
+      paddingBottom: Platform.OS === "ios" ? 38 : 26,
+      paddingTop: 10,
       alignItems: "center",
       gap: 10,
     },
@@ -745,60 +852,67 @@ function getStyles(isDark: boolean, isShaking: boolean) {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
+      paddingHorizontal: 16,
     },
     hintText: {
       fontSize: 13,
       color: isDark ? "#52525b" : "#a1a1aa",
       textAlign: "center",
-      padding: 0,
+      lineHeight: 20,
     },
     aboutButton: {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
-      paddingVertical: 4,
-      paddingHorizontal: 12,
+      paddingVertical: 6,
+      paddingHorizontal: 14,
       borderRadius: 20,
       backgroundColor: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)",
+      borderWidth: 1,
+      borderColor: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)",
     },
     aboutText: {
       fontSize: 13,
       fontWeight: "500",
-      color: isDark ? "#52525b" : "#a1a1aa",
+      color: isDark ? "#62626e" : "#a1a1aa",
       textAlign: "center",
-      padding: 0,
+      lineHeight: 20,
     },
-    // Bottom Sheet
+
+    // ── Bottom Sheet ────────────────────────────────────
     sheetContent: {
-      paddingHorizontal: 32,
+      paddingHorizontal: 36,
       paddingTop: 8,
-      paddingBottom: 40,
+      paddingBottom: 44,
       alignItems: "center",
     },
     sheetIconWrap: {
-      width: 52,
-      height: 52,
-      borderRadius: 26,
+      width: 50,
+      height: 50,
+      borderRadius: 25,
       backgroundColor: isDark
         ? "rgba(129,140,248,0.1)"
         : "rgba(99,102,241,0.08)",
       alignItems: "center",
       justifyContent: "center",
-      marginBottom: 16,
+      marginBottom: 18,
     },
     sheetTitle: {
       fontSize: 20,
       fontWeight: "700",
-      marginBottom: 20,
-      padding: 0,
+      marginBottom: 18,
+      lineHeight: 28,
+      paddingVertical: 2,
       letterSpacing: -0.3,
+      textAlign: "center",
     },
     sheetBody: {
       fontSize: 15,
       lineHeight: 24,
       textAlign: "center",
-      padding: 0,
-      marginBottom: 8,
+      paddingVertical: 2,
+      paddingHorizontal: 8,
+      marginBottom: 6,
     },
     sheetDivider: {
       width: 32,
@@ -809,7 +923,8 @@ function getStyles(isDark: boolean, isShaking: boolean) {
     sheetCredit: {
       fontSize: 12,
       textAlign: "center",
-      padding: 0,
+      lineHeight: 18,
+      paddingVertical: 2,
     },
   });
 }
