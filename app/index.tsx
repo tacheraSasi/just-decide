@@ -467,7 +467,7 @@ function getStyles(
       alignItems: "center",
     },
     hintText: {
-      fontSize: 14,
+      fontSize: 20,
       color: isDark ? "#71717a" : "#9ca3af",
       textAlign: "center",
       fontStyle: "italic",
