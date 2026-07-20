@@ -1,50 +1,81 @@
-# Welcome to your Expo app 👋
+# Just Decide
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A mobile app that helps you make decisions by shaking your phone. Built with Expo and React Native.
 
-## Get started
+![App screenshot 1](assets/images/screenshots/1.jpeg)
+![App screenshot 2](assets/images/screenshots/2.jpeg)
+![App screenshot 3](assets/images/screenshots/3.jpeg)
+![App screenshot 4](assets/images/screenshots/4.jpeg)
+![App screenshot 5](assets/images/screenshots/5.jpeg)
 
-1. Install dependencies
+## How it works
 
-   ```bash
-   npm install
-   ```
+Just Decide uses your device's accelerometer to detect a shake. When you shake your phone, the app animates a decision card that lands on one of three outcomes: YES, NO, or MAYBE. Each outcome includes haptic feedback and a unique visual treatment.
 
-2. Start the app
+- **YES** triggers confetti and a heavy haptic pulse
+- **NO** delivers a warning notification
+- **MAYBE** responds with a medium haptic tap
 
-   ```bash
-   npx expo start
-   ```
+A cooldown period prevents accidental repeated shakes.
 
-In the output, you'll find options to open the app in a
+## Features
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- Shake-to-decide using the device accelerometer
+- Animated card with shake, spin, pulse, and slide effects
+- Haptic feedback for each outcome type
+- Confetti celebration on YES results
+- Dark and light theme support (auto-switches based on system preference, or manual toggle)
+- About bottom sheet with app information
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## Tech stack
 
-## Get a fresh project
+- [Expo](https://expo.dev) with SDK 56
+- [Expo Router](https://docs.expo.dev/router/introduction) for file-based navigation
+- [react-native-reanimated](https://docs.swmansion.com/react-native-reanimated) for animations
+- [expo-haptics](https://docs.expo.dev/versions/latest/sdk/haptics) for haptic feedback
+- [expo-sensors](https://docs.expo.dev/versions/latest/sdk/sensors) for accelerometer input
+- [react-native-confetti-cannon](https://github.com/vibes0389/react-native-confetti-cannon) for confetti effects
+- [@gorhom/bottom-sheet](https://github.com/gorhom/react-native-bottom-sheet) for the about panel
 
-When you're ready, run:
+## Getting started
+
+### Prerequisites
+
+- [Bun](https://bun.sh) (or npm)
+- [Expo CLI](https://docs.expo.dev/get-started/installation)
+
+### Install dependencies
 
 ```bash
-npm run reset-project
+bun install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### Start the app
 
-## Learn more
+```bash
+bun start
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+Scan the QR code with Expo Go on your phone, or press `a` for Android emulator / `i` for iOS simulator.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+### Build for production
 
-## Join the community
+```bash
+npx expo export
+```
 
-Join our community of developers creating universal apps.
+## Project structure
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+```
+app/
+  _layout.tsx        Root layout with theme and navigation providers
+  index.tsx          Main decision screen
+assets/
+  images/
+    screenshots/     App store screenshots
+    icon/            App icons for Android and iOS
+components/
+  haptic-tab.tsx     Haptic tab bar button (legacy, unused)
+contexts/
+  theme-context.tsx  Dark/light theme context provider
+```
