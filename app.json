@@ -1,18 +1,13 @@
 {
   "expo": {
-    "name": "just-decide",
+    "name": "Just Decide",
     "slug": "just-decide",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon/android/play_store_512.png",
     "scheme": "justdecide",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/images/icon/android/play_store_512.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
+
     "ios": {
       "supportsTablet": true,
       "icon": "./assets/images/icon/ios/AppIcon~ios-marketing.png"
@@ -24,7 +19,7 @@
         "monochromeImage": "./assets/images/icon/android/res/mipmap-xxxhdpi/ic_launcher_monochrome.png"
       },
       "icon": "./assets/images/icon/android/res/mipmap-xxxhdpi/ic_launcher.png",
-      "edgeToEdgeEnabled": true,
+
       "predictiveBackGestureEnabled": false,
       "package": "com.tach.justdecide"
     },
@@ -46,7 +41,11 @@
           }
         }
       ],
-      "expo-audio"
+      "expo-audio",
+      "expo-font",
+      "expo-image",
+      "expo-status-bar",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true,
