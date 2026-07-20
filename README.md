@@ -2,11 +2,13 @@
 
 A mobile app that helps you make decisions by shaking your phone. Built with Expo and React Native.
 
-![App screenshot 1](assets/images/screenshots/1.jpeg)
-![App screenshot 2](assets/images/screenshots/2.jpeg)
-![App screenshot 3](assets/images/screenshots/3.jpeg)
-![App screenshot 4](assets/images/screenshots/4.jpeg)
-![App screenshot 5](assets/images/screenshots/5.jpeg)
+<div style="display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0;">
+  <img src="assets/images/screenshots/1.jpeg" width="160" alt="App screenshot 1">
+  <img src="assets/images/screenshots/2.jpeg" width="160" alt="App screenshot 2">
+  <img src="assets/images/screenshots/3.jpeg" width="160" alt="App screenshot 3">
+  <img src="assets/images/screenshots/4.jpeg" width="160" alt="App screenshot 4">
+  <img src="assets/images/screenshots/5.jpeg" width="160" alt="App screenshot 5">
+</div>
 
 ## How it works
 
@@ -74,8 +76,6 @@ assets/
   images/
     screenshots/     App store screenshots
     icon/            App icons for Android and iOS
-components/
-  haptic-tab.tsx     Haptic tab bar button (legacy, unused)
 contexts/
   theme-context.tsx  Dark/light theme context provider
 ```
